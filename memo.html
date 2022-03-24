@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  </head>
+  <body>
+    <div id="app">
+      <h2>메모</h2>
+      <input type="text" v-model="memoTitle" /><br />
+      <textarea v-model="memo" rows="13" cols="30"></textarea>
+      <button @click="addMemo">추가</button>
+      <memo-component
+        v-for="m in memolist"
+        :id="m.id"
+        :key="m.id"
+        @delete="deleteMemo"
+        ><h3>
+          {{ m.memoTitle }}
+          <button @click="deleteMemo">X</button>
+        </h3>
+        {{ m.memo }}</memo-component
+      >
+    </div>
+
+    <script>
+      Vue.component("memo-component", {
+        props: ["id"],
+        template: `
+                <div>
+                    <slot></slot>
+                    <hr>
+                    <p>
+                        {{new Date().getFullYear()}}년 
+                        {{new Date().getMonth()+1}}월 
+                        {{new Date().getDate()}}일
+                    </p>
+                </div>
+            `,
+
+        methods: {
+          deleteMemo() {
+            this.$emit("delete", this.id);
+          },
+        },
+      });
+
+      new Vue({
+        el: "#app",
+        data: {
+          id: 0,
+          memoTitle: "",
+          memo: "",
+          memolist: [],
+        },
+        methods: {
+          addMemo() {
+            this.memolist.push({
+              id: this.id,
+              memoTitle: this.memoTitle,
+              memo: this.memo,
+            });
+            this.id++;
+            this.memo = "";
+            this.memoTitle = "";
+          },
+          deleteMemo(id) {
+            let index = 0;
+            this.memolist.forEach((element, i) => {
+              if (element.id == id) {
+                index = i;
+              }
+            });
+            this.memolist.splice(index, 1);
+          },
+        },
+      });
+    </script>
+  </body>
+</html>
